@@ -4,6 +4,7 @@ import sys, time
 import socket
 import msg_interface as m
 import poller
+import tftp2_pb2 as p
 
 '''Classe CallbackSend:
 
@@ -23,7 +24,11 @@ class CallbackSend(poller.Callback):
         f = filename.rsplit('/', 1)[-1]
 
         # WRQ: Pacote para Escrita de arquivo
-        self._packet = m.Wrq(f, mode) 
+        # self._packet = m.Wrq(f, mode) 
+        # TODO mudanca para proto
+        self._packet = p.REQ()
+        self._packet.fname = f
+        self._packet.mode = mode
         self.path = filename if filename[0] == '/' else "./" + filename # caminho para leitura
         
         # Arquivo de leitura
@@ -31,7 +36,7 @@ class CallbackSend(poller.Callback):
         self._n = 0
     
         # Solicita ao servidor escrita de arquivo
-        self._sock.sendto(self._packet.serialize(), self._address)
+        self._sock.sendto(self._packet.SerializeToString(), self._address)
         print(f"{self.prefixLog} init() sendto packet WRQ: {self._packet}, serialized: {self._packet.serialize()}")
 
         self.enable_timeout()
@@ -42,7 +47,9 @@ class CallbackSend(poller.Callback):
 
     def handle_init_tx(self, packet):
         # Cria uma instancia do pacote recebido (deserializar)
-        obj = m.cria_instancia(packet)
+        # obj = m.cria_instancia(packet)
+        # TODO Mudanca para proto
+        obj = p.ParseFromString(packet)
 
         if obj.Opcode == 4:
             ack_n = obj.block # obtem o ack_n
