@@ -26,37 +26,37 @@ copia.ParseFromString(data)
 msgDecodificada = ''
 
 #RRQ
-if msg.WhichOneof('msg') == 'rrq':
+if copia.WhichOneof('msg') == 'rrq':
     print('msg: ', copia)
     msgDecodificada = (copia.rrq.fname, copia.rrq.mode)
 
 #WRQ
-elif msg.WitchOneof('msg') == 'wrq':
+elif copia.WitchOneof('msg') == 'wrq':
     print('msg: ', copia)
     msgDecodificada = (copia.wrq.fname, copia.wrq.mode)
 
 #DATA
-elif msg.WitchOneof('msg') == 'data':
+elif copia.WitchOneof('msg') == 'data':
     print('msg: ', copia)
     msgDecodificada = (copia.data.message, copia.data.block_n)
 
 #ACK
-elif msg.WitchOneof('msg') == 'ack':
+elif copia.WitchOneof('msg') == 'ack':
     print('msg: ', copia)
     msgDecodificada = (copia.ack.block_n)
 
 #Error
-elif msg.WitchOneof('msg') == 'error':
+elif copia.WitchOneof('msg') == 'error':
     print('msg: ', copia)
     msgDecodificada = (copia.error.errorcode)
 
 #Path
-elif msg.WitchOneof('msg') == 'path':
+elif copia.WitchOneof('msg') == 'path':
     print('msg: ', copia)
     msgDecodificada = (copia.path.errorcode)
 
 #ListResponse
-elif msg.WitchOneof('msg') == 'list_resp':
+elif copia.WitchOneof('msg') == 'list_resp':
     print('msg: ', copia)
     msgDecodificada = (copia.list_resp.items.file.nome, copia.list_resp.items.dir.nome, copia.list_resp.items.file.tamanho, copia.list_resp.items.dir.path)
 

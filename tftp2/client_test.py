@@ -53,9 +53,9 @@ c = client_tftp.ClientTFTP(server=ip, port=port)
 
 # Define o modo octet ou netascii
 if mode == Mode.OCTET.value:
-    mode = Mode.OCTET.name.lower()
+    mode = Mode.OCTET.value
 else:
-    mode = Mode.NETASCII.name.lower()
+    mode = Mode.NETASCII.value
 
 # Solicitacao de leitura de arquivo
 if request == Request.RRQ.value:

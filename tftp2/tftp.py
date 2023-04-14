@@ -26,9 +26,12 @@ class CallbackSend(poller.Callback):
         # WRQ: Pacote para Escrita de arquivo
         # self._packet = m.Wrq(f, mode) 
         # TODO mudanca para proto
-        self._packet = p.REQ()
-        self._packet.fname = f
-        self._packet.mode = mode
+        self._packet = p.Mensagem()
+        self._packet.wrq.fname = f
+        self._packet.wrq.mode = mode
+        #self._packet = p.REQ()
+        #self._packet.fname = f
+        #self._packet.mode = mode
         self.path = filename if filename[0] == '/' else "./" + filename # caminho para leitura
         
         # Arquivo de leitura
@@ -37,7 +40,7 @@ class CallbackSend(poller.Callback):
     
         # Solicita ao servidor escrita de arquivo
         self._sock.sendto(self._packet.SerializeToString(), self._address)
-        print(f"{self.prefixLog} init() sendto packet WRQ: {self._packet}, serialized: {self._packet.serialize()}")
+        print(f"{self.prefixLog} init() sendto packet WRQ: {self._packet}, serialized: {self._packet.SerializeToString()}")
 
         self.enable_timeout()
 
@@ -49,10 +52,14 @@ class CallbackSend(poller.Callback):
         # Cria uma instancia do pacote recebido (deserializar)
         # obj = m.cria_instancia(packet)
         # TODO Mudanca para proto
-        obj = p.ParseFromString(packet)
+        obj = p.Mensagem()
+        obj.ParseFromString(packet)
 
-        if obj.Opcode == 4:
-            ack_n = obj.block # obtem o ack_n
+        print('msg: ', obj)
+
+        if obj.WhichOneof('msg') == 'ack':
+            print('msg: ', obj)
+            ack_n = obj.ack.block_n # obtem o ack_n
             print(f"{self.prefixLog} handle_init_tx() obj: {obj} ack_n = {ack_n}")
 
         if ack_n == 0:
@@ -63,9 +70,13 @@ class CallbackSend(poller.Callback):
             self._n = self._n + 1
             blocknum = self._n
             print(f"{self.prefixLog} handle_init_tx() blocknum = {blocknum}")
-            data = m.Data(blocknum=blocknum,body=body)
+            #data = m.Data(blocknum=blocknum,body=body)
+            d = p.Mensagem()
+            d.data.block_n = blocknum
+            d.data.message = body
+            data = d.SerializeToString()
             print(f"{self.prefixLog} send data: {data}")
-            self._sock.sendto(data.serialize(), self._address)
+            self._sock.sendto(data, self._address)
 
             if buffer == 512:
                 self._current_handler = self.handle_tx
@@ -80,10 +91,14 @@ class CallbackSend(poller.Callback):
 
     def handle_tx(self, packet):
         # Cria uma instancia do pacote recebido (deserializar)
-        obj = m.cria_instancia(packet)
+        #obj = m.cria_instancia(packet)
 
-        if obj.Opcode == 4:
-            ack_n = obj.block
+        obj = p.Mensagem()
+        obj.ParseFromString(packet)
+
+        if obj.WhichOneof('msg') == 'ack':
+            print('msg: ', obj)
+            ack_n = obj.ack.block_n # obtem o ack_n
             print(f"{self.prefixLog} handle_tx() ack_n = {ack_n}")
 
         body = self.file.read(512)
@@ -95,33 +110,43 @@ class CallbackSend(poller.Callback):
             self._n += 1
             blocknum = self._n
             print(f"{self.prefixLog} handle_tx() blocknum: {blocknum}")
-            data = m.Data(blocknum=blocknum,body=body)
+            #data = m.Data(blocknum=blocknum,body=body)
+            d = p.Mensagem()
+            d.data.block_n = blocknum
+            d.data.message = body
+            data = d.SerializeToString()
             print(f"{self.prefixLog} handle_tx() send data: {data}")
         
             if buffer >= 512:
-                self._sock.sendto(data.serialize(), self._address)
+                self._sock.sendto(data, self._address)
             
             elif buffer < 512:
-                self._sock.sendto(data.serialize(), self._address)
+                self._sock.sendto(data, self._address)
                 self._current_handler = self.handle_finish
 
         # Timeout
         else: 
             print(f"{self.prefixLog} handle_tx() Timeout, body: {body}, blocknum = {self.n} ack_n ={ack_n}")
             blocknum = self._n
-            data = m.Data(blocknum=blocknum,body=body)
+            #data = m.Data(blocknum=blocknum,body=body)
+            d = p.Mensagem()
+            d.data.block_n = blocknum
+            d.data.message = body
+            data = d.SerializeToString()
             print(f"{self.prefixLog} handle_tx() Timeout send data: {data}")
-            self._sock.sendto(data.serialize(), self._address)
+            self._sock.sendto(data, self._address)
             
 
     def handle_finish(self, packet):
 
         # Cria uma instacia do pacote recebido (deserializar)
-        obj = m.cria_instancia(packet)
+        #obj = m.cria_instancia(packet)
+        obj = p.Mensagem()
+        obj.ParseFromString(packet)
 
-        # Recebe pacote de ACK
-        if (obj.Opcode == 4):
-            ack_n = obj.block
+        if obj.WhichOneof('msg') == 'ack':
+            print('msg: ', obj)
+            ack_n = obj.ack.block_n # obtem o ack_n
             print(f"{self.prefixLog} handle_finish() ack_n = {ack_n}")
         
             if (ack_n == self._n):
@@ -130,7 +155,7 @@ class CallbackSend(poller.Callback):
                 self.disable()
 
         # Recebe pacote de Error
-        elif(obj.Opcode == 5):
+        elif obj.WhichOneof('msg') == 'error':
             print(f"{self.prefixLog} handle_finish() Error... :)")
             self.disable_timeout()
             self.disable()
@@ -140,8 +165,12 @@ class CallbackSend(poller.Callback):
             print(f"{self.prefixLog} handle_finish() ack_n = {ack_n}")
             body = self.file.read(512)
             blocknum = self._n
-            data = m.Data(blocknum=blocknum,body=body)
-            self._sock.sendto(data.serialize(), self._address)
+            d = p.Mensagem()
+            d.data.block_n = blocknum
+            d.data.message = body
+            data = d.SerializeToString()
+            #data = m.Data(blocknum=blocknum,body=body)
+            self._sock.sendto(data, self._address)
 
 
     def handle(self):
