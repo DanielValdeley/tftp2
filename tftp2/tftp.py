@@ -24,14 +24,9 @@ class CallbackSend(poller.Callback):
         f = filename.rsplit('/', 1)[-1]
 
         # WRQ: Pacote para Escrita de arquivo
-        # self._packet = m.Wrq(f, mode) 
-        # TODO mudanca para proto
         self._packet = p.Mensagem()
         self._packet.wrq.fname = f
         self._packet.wrq.mode = mode
-        #self._packet = p.REQ()
-        #self._packet.fname = f
-        #self._packet.mode = mode
         self.path = filename if filename[0] == '/' else "./" + filename # caminho para leitura
         
         # Arquivo de leitura
@@ -49,9 +44,8 @@ class CallbackSend(poller.Callback):
         
 
     def handle_init_tx(self, packet):
+
         # Cria uma instancia do pacote recebido (deserializar)
-        # obj = m.cria_instancia(packet)
-        # TODO Mudanca para proto
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
@@ -70,11 +64,13 @@ class CallbackSend(poller.Callback):
             self._n = self._n + 1
             blocknum = self._n
             print(f"{self.prefixLog} handle_init_tx() blocknum = {blocknum}")
+            
             #data = m.Data(blocknum=blocknum,body=body)
             d = p.Mensagem()
             d.data.block_n = blocknum
             d.data.message = body
             data = d.SerializeToString()
+
             print(f"{self.prefixLog} send data: {data}")
             self._sock.sendto(data, self._address)
 
@@ -91,10 +87,10 @@ class CallbackSend(poller.Callback):
 
     def handle_tx(self, packet):
         # Cria uma instancia do pacote recebido (deserializar)
-        #obj = m.cria_instancia(packet)
-
         obj = p.Mensagem()
         obj.ParseFromString(packet)
+
+        print('msg: ', obj)
 
         if obj.WhichOneof('msg') == 'ack':
             print('msg: ', obj)
@@ -128,11 +124,13 @@ class CallbackSend(poller.Callback):
         else: 
             print(f"{self.prefixLog} handle_tx() Timeout, body: {body}, blocknum = {self.n} ack_n ={ack_n}")
             blocknum = self._n
+
             #data = m.Data(blocknum=blocknum,body=body)
             d = p.Mensagem()
             d.data.block_n = blocknum
             d.data.message = body
             data = d.SerializeToString()
+
             print(f"{self.prefixLog} handle_tx() Timeout send data: {data}")
             self._sock.sendto(data, self._address)
             
@@ -140,12 +138,12 @@ class CallbackSend(poller.Callback):
     def handle_finish(self, packet):
 
         # Cria uma instacia do pacote recebido (deserializar)
-        #obj = m.cria_instancia(packet)
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
+        print('msg: ', obj)
+
         if obj.WhichOneof('msg') == 'ack':
-            print('msg: ', obj)
             ack_n = obj.ack.block_n # obtem o ack_n
             print(f"{self.prefixLog} handle_finish() ack_n = {ack_n}")
         
@@ -165,15 +163,15 @@ class CallbackSend(poller.Callback):
             print(f"{self.prefixLog} handle_finish() ack_n = {ack_n}")
             body = self.file.read(512)
             blocknum = self._n
+
+            #data = m.Data(blocknum=blocknum,body=body)            
             d = p.Mensagem()
             d.data.block_n = blocknum
             d.data.message = body
             data = d.SerializeToString()
-            #data = m.Data(blocknum=blocknum,body=body)
+
             self._sock.sendto(data, self._address)
 
-
-    def handle(self):
         'Recebe pacote via socket'
         try:
             packet, addr = self._sock.recvfrom(516)
@@ -214,15 +212,18 @@ class CallbackReceived(poller.Callback):
         self._address = address
 
         # RRQ: Pacote para Leitura de arquivo
-        self._packet = m.Rrq(filename, mode) 
+        self._packet = p.Mensagem()
+        self._packet.rrq.fname = filename
+        self._packet.rrq.mode = mode
+
         self.path = "./" + filename # caminho para escrita
         # Arquivo para escrita
         self.file = open(self.path, 'wb')
         self._n = 1
     
         # Solicita ao servidor leitura de arquivo
-        self._sock.sendto(self._packet.serialize(), self._address) 
-        print(f"{self.prefixLog} init() sendto packet RRQ: {self._packet}, serialized: {self._packet.serialize()}")
+        self._sock.sendto(self._packet.SerializeToString(), self._address) 
+        print(f"{self.prefixLog} init() sendto packet RRQ: {self._packet}, serialized: {self._packet.SerializeToString()}")
 
         self.enable_timeout()
 
@@ -236,17 +237,25 @@ class CallbackReceived(poller.Callback):
         if (packet == None):
             print(f"{self.prefixLog} packet is None!")
             blocknum = None
-            ack = m.Ack(blocknum)
-            self._sock.sendto(ack.serialize(), self._address)
+
+            #ack = m.Ack(blocknum)            
+            a = p.Mensagem()
+            a.ack.block_n = blocknum
+            ack = d.SerializeToString()
+
+            self._sock.sendto(ack, self._address)
 
         else: 
 
-             # Cria uma instacia do pacote recebido (deserializar)
-            obj = m.cria_instancia(packet)
+            # Cria uma instacia do pacote recebido (deserializar)
+            obj = p.Mensagem()
+            obj.ParseFromString(packet)
 
-            if obj.Opcode == 3:
-                data_body = obj.body
-                data_n = obj.blocknum
+            print('msg: ', obj)  
+
+            if obj.WhichOneof('msg') == 'data':  
+                data_body = obj.data.message
+                data_n = obj.data.block_n
                 print(f"{self.prefixLog} handle_rx() obj: {obj} data_body: {data_body}")
                 print(f"{self.prefixLog} handle_rx() data_n: {data_n}")
 
@@ -255,17 +264,29 @@ class CallbackReceived(poller.Callback):
 
                 if data_n == self._n and buffer == 512:
                     blocknum = self._n
-                    ack = m.Ack(blocknum)
+
+                    #ack = m.Ack(blocknum)
+                    a = p.Mensagem()
+                    a.ack.block_n = blocknum
+                    ack = a.SerializeToString()
+                    
                     print(f"{self.prefixLog} handle_rx() send ack: {ack}")
-                    self._sock.sendto(ack.serialize(), self._address)
+                    self._sock.sendto(ack, self._address)
                     self._n = self._n + 1
                     self.file.write(data_body)
 
                 elif data_n == self._n and buffer < 512: 
                     blocknum = self._n
-                    ack = m.Ack(blocknum)
+                    
+                    #ack = m.Ack(blocknum)
+                    a = p.Mensagem()
+                    a.ack.block_n = blocknum
+                    ack = a.SerializeToString()
+
                     print(f"{self.prefixLog} handle_rx() send ack: {ack}")
-                    self._sock.sendto(ack.serialize(), self._address)
+
+                    self._sock.sendto(ack, self._address)
+
                     self.file.write(data_body)
                     print(f"{self.prefixLog} handle_rx() Finish...")
                     self.disable()
