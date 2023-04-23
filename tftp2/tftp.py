@@ -172,6 +172,7 @@ class CallbackSend(poller.Callback):
 
             self._sock.sendto(data, self._address)
 
+    def handle(self):
         'Recebe pacote via socket'
         try:
             packet, addr = self._sock.recvfrom(516)
