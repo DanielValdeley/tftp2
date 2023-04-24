@@ -319,7 +319,7 @@ class CallbackReceived(poller.Callback):
 
 
 ######################################
-#### Novas mensagens do TFTP2 ###########
+#### Novas mensagens do TFTP2 ########
 ######################################
 
 '''Classe CallbackList:
