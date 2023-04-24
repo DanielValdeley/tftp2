@@ -1,6 +1,6 @@
 from enum import Enum
 import sys
-import client_tftp
+import client_tftp2 as client_tftp2
 
 '''Program cliente teste
 
@@ -18,6 +18,8 @@ PORT = 6969
 class Request(Enum):
     RRQ = 1
     WRQ = 2
+    LIST = 3
+    MKDIR = 4
 
 
 '''Classe Mode
@@ -29,7 +31,6 @@ class Mode(Enum):
     OCTET = 1
     NETASCII = 2
         
-
 try:
     namefile = str(sys.argv[1])
     request = int(sys.argv[2])
@@ -39,7 +40,7 @@ try:
  
 
 except:
-    print("\nUso: python3 client_test.py file_name recv=1/send=2 octet=1/netascii=2 IP PORT")
+    print("\nUso: python3 client_test.py file_name recv=1/send=2/list=3/mkdir=4 octet=1/netascii=2 IP PORT")
     print("ex: python3 client_test.py file_name 1 1 127.0.0.1 6969\n")
     #namefile = '/etc/hosts'
     #ip = IP
@@ -49,7 +50,7 @@ except:
 
 
 # Cria uma instancia de Cliente TFTP
-c = client_tftp.ClientTFTP(server=ip, port=port)
+c = client_tftp2.ClientTFTP(server=ip, port=port)
 
 # Define o modo octet ou netascii
 if mode == Mode.OCTET.value:
@@ -59,14 +60,16 @@ else:
 
 # Solicitacao de leitura de arquivo
 if request == Request.RRQ.value:
-    #namefile = 'arquivorecebidopequeno' # ok (<=512)
-    #namefile = 'arquivorecebidogrande' # ok (>512)
     c.recebe(namefile, mode)
 
 # Solicitacao de escrita de arquivo
 elif request == Request.WRQ.value:
-    #namefile = 'arquivoenviopequeno' # ok (<=512)
-    #namefile = 'arquivoenviogrande' # ok (>512)
     c.envia(namefile, mode)
 
+# Lisgatem de pasta
+elif request == Request.LIST.value:
+    c.list(namefile)
 
+# Cria uma pasta
+elif request == Request.MKDIR.value:
+    c.mkdir(namefile)
