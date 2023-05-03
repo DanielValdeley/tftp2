@@ -9,7 +9,7 @@
 
 2. Executar o contêiner a partir da imagem criada
 ```shell
-    docker run -it --rm -v `pwd`:/tftp2  --name tftp2 ptc/tftp2
+    docker run -it --rm -v `pwd`:/ptc  --name tftp2 ptc/tftp2
 ```
 
 3. Atenção ao executar o Servidor:
