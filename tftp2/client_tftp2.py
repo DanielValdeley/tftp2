@@ -43,6 +43,11 @@ class ClientTFTP:
 
 
     def mkdir(self, filename:str):
-        cm = t.CallbackCreateDir(sock=self.s, timeout=self.timeout, address=self._addr, filename=filename)
+        cmk = t.CallbackCreateDir(sock=self.s, timeout=self.timeout, address=self._addr, filename=filename)
+        self.sched.adiciona(cmk)
+        self.sched.despache()
+
+    def move(self, oldfilename:str, newfilename:str):
+        cm = t.CallbackMove(sock=self.s, timeout=self.timeout, address=self._addr, oldfilename=oldfilename, newfilename=newfilename)
         self.sched.adiciona(cm)
         self.sched.despache()

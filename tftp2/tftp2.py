@@ -416,10 +416,71 @@ class CallbackCreateDir(poller.Callback):
 
         if obj.WhichOneof('msg') == 'ack':
             ack = obj.ack.block_n # obtem ack com bumero de bloco 0
-            print(f"{self.prefixLog} handle_create_dir() ack: {ack}")
+            print(f"{self.prefixLog} handle_create_dir() success ack: {ack}")
         else:
             err = obj.errorcode
-            print(f"{self.prefixLog} handle_create_dir() erro: {err}")
+            print(f"{self.prefixLog} handle_create_dir() error: {err}")
+
+
+    def handle(self):
+        'Recebe pacote via socket'
+        try:
+            packet, addr = self._sock.recvfrom(516)
+            print(f"{self.prefixLog} Received packet: {packet}, address: {addr}")
+            self._address = (addr[0], addr[1])
+            self._current_handler(packet=packet)
+
+        except:
+            'Se ocorrer algum erro na recpecao chama handle_timeout'
+            print(f"{self.prefixLog} fail received packet!")
+            self._current_handler = self.handle_timeout
+            
+
+    def handle_timeout(self):
+        'O tratador de evento timeout'
+        self.disable_timeout()         
+        self.disable()   
+
+
+'''Classe CallbackCreateDir:
+
+        Declara um Callback capaz de renomear ou remover arquivos.'''
+class CallbackMove(poller.Callback):
+    prefixLog = "CallbackMove: "
+   
+    def __init__(self, sock:socket, timeout:float, address, oldfilename:str, newfilename:str):
+        poller.Callback.__init__(self, sock, timeout)
+
+        self._sock = sock
+        self._address = address
+
+        # MOVE: mover ou renomear um arquivo
+        self._packet = p.Mensagem()
+        self._packet.move.nome_orig = oldfilename
+        self._packet.move.nome_novo = newfilename
+
+        # Solicita ao servidor a remocao ou renomeacao do arquivo
+        self._sock.sendto(self._packet.SerializeToString(), self._address) 
+        print(f"{self.prefixLog} init() sendto packet MOVE: {self._packet}, serialized: {self._packet.SerializeToString()}")
+
+        self.enable_timeout()
+
+        # Estado atual
+        self._current_handler = self.handle_move
+
+    def handle_move(self, packet):
+         # Cria uma instancia do pacote recebido (deserializar)
+        obj = p.Mensagem()
+        obj.ParseFromString(packet)
+
+        print('msg: ', obj)
+
+        if obj.WhichOneof('msg') == 'ack':
+            ack = obj.ack.block_n # obtem ack com bumero de bloco 0
+            print(f"{self.prefixLog} handle_move() success ack: {ack}")
+        else:
+            err = obj.errorcode
+            print(f"{self.prefixLog} handle_move() error: {err}")
 
 
     def handle(self):

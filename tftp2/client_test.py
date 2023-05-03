@@ -20,6 +20,7 @@ class Request(Enum):
     WRQ = 2
     LIST = 3
     MKDIR = 4
+    MOVE = 5
 
 
 '''Classe Mode
@@ -33,15 +34,16 @@ class Mode(Enum):
         
 try:
     namefile = str(sys.argv[1])
-    request = int(sys.argv[2])
-    mode = int(sys.argv[3])
-    ip = str(sys.argv[4])
-    port = int(sys.argv[5])
+    newnamefile = str(sys.argv[2])
+    request = int(sys.argv[3])
+    mode = int(sys.argv[4])
+    ip = str(sys.argv[5])
+    port = int(sys.argv[6])
  
 
 except:
-    print("\nUso: python3 client_test.py file_name recv=1/send=2/list=3/mkdir=4 octet=1/netascii=2 IP PORT")
-    print("ex: python3 client_test.py file_name 1 1 127.0.0.1 6969\n")
+    print("\nUso: python3 client_test.py file_name new_filename [recv=1/send=2] [list=3/mkdir=4/move=5] [octet=1/netascii=2] IP PORT")
+    print("ex: python3 client_test.py file_name new_namefile 1 1 127.0.0.1 6969\n")
     #namefile = '/etc/hosts'
     #ip = IP
     #port = PORT
@@ -73,3 +75,6 @@ elif request == Request.LIST.value:
 # Cria uma pasta
 elif request == Request.MKDIR.value:
     c.mkdir(namefile)
+
+elif request == Request.MOVE.value:
+    c.move(oldfilename=namefile, newfilename=newnamefile)
