@@ -79,10 +79,6 @@ class CallbackSend(poller.Callback):
 
             elif buffer < 512: 
                 self._current_handler = self.handle_finish
-
-        # Timeout
-        else:
-            self.handle_timeout 
             
 
     def handle_tx(self, packet):
@@ -106,7 +102,6 @@ class CallbackSend(poller.Callback):
             self._n += 1
             blocknum = self._n
             print(f"{self.prefixLog} handle_tx() blocknum: {blocknum}")
-            #data = m.Data(blocknum=blocknum,body=body)
             d = p.Mensagem()
             d.data.block_n = blocknum
             d.data.message = body
@@ -125,7 +120,6 @@ class CallbackSend(poller.Callback):
             print(f"{self.prefixLog} handle_tx() Timeout, body: {body}, blocknum = {self.n} ack_n ={ack_n}")
             blocknum = self._n
 
-            #data = m.Data(blocknum=blocknum,body=body)
             d = p.Mensagem()
             d.data.block_n = blocknum
             d.data.message = body
@@ -292,10 +286,6 @@ class CallbackReceived(poller.Callback):
                     self.disable()
                     self.disable_timeout()
 
-            # Timeout
-            else:
-                self.handle_timeout
-
 
     def handle(self):
         'Recebe pacote via socket'
@@ -318,9 +308,9 @@ class CallbackReceived(poller.Callback):
         self.disable()   
 
 
-######################################
-#### Novas mensagens do TFTP2 ########
-######################################
+#######################################
+##### Novas mensagens do TFTP2 ########
+#######################################
 
 '''Classe CallbackList:
 
@@ -328,7 +318,7 @@ class CallbackReceived(poller.Callback):
 class CallbackList(poller.Callback):
     prefixLog = "CallbackList: "
    
-    def __init__(self, sock:socket, timeout:float, address, filename:str):
+    def __init__(self, sock:socket, timeout:float, address, dir:str):
         poller.Callback.__init__(self, sock, timeout)
 
         self._sock = sock
@@ -336,7 +326,7 @@ class CallbackList(poller.Callback):
 
         # LIST: fazer listagem de uma pasta
         self._packet = p.Mensagem()
-        self._packet.list.path = filename
+        self._packet.list.path = dir
 
         # Solicita ao servidor listagem de uma pasta
         self._sock.sendto(self._packet.SerializeToString(), self._address) 
@@ -388,7 +378,7 @@ class CallbackList(poller.Callback):
 class CallbackCreateDir(poller.Callback):
     prefixLog = "CallbackCreateDir: "
    
-    def __init__(self, sock:socket, timeout:float, address, filename:str):
+    def __init__(self, sock:socket, timeout:float, address, dir:str):
         poller.Callback.__init__(self, sock, timeout)
 
         self._sock = sock
@@ -396,7 +386,7 @@ class CallbackCreateDir(poller.Callback):
 
         # MKDIR: criar uma pasta
         self._packet = p.Mensagem()
-        self._packet.mkdir.path = filename
+        self._packet.mkdir.path = dir
 
         # Solicita ao servidor a criacao de uma pasta
         self._sock.sendto(self._packet.SerializeToString(), self._address) 
