@@ -1,10 +1,10 @@
 # PTC
 
-## Projeto TFTP2
+### Projeto TFTP2
 
 O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.com/mmsobral-croom/projeto-1-um-protocolo-de-transferencia-de-arquivos-ptc-daniel). Com a adição de novas funcionalidades.
 
-## Entrega
+### Entrega
 
 - [Cliente TFTP2](/tftp2/client_tftp2.py) - Cliente do protocolo TFTP2
 
@@ -14,11 +14,11 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
 
 - [TFTP2](/tftp2/tftp2.py) - Implementação do protocolo 
 
-## Disponibilizado pelo professor
+### Disponibilizado pelo professor
 
 - [Servidor]() - Servidor tftp (também atende o tftp2) linkado estaticamente
 
-## Como testar as funcionalidades
+### Como testar as funcionalidades
 
 >Afim de facilitar a instalação foi criado um Dockefile com as bibliotecas necessárias para o funcionamento
 
@@ -73,16 +73,16 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
         ```shell
             python3 client_test.py arquivo 5 1 127.0.0.1 6969 novo-nome-arquivo
         ```
-## Especificação do protocolo TFTP2
+### Especificação do protocolo TFTP2
 
-### Serviço oferecido + novas funcionalidades
+#### Serviço oferecido + novas funcionalidades
 
   - envia e recebe arquivos
   - lista pastas, obtem uma listagem de arquivos com respectivos atributos (nome, tamanho)
   - criar pastas
   - renomear ou remover arquivos
 
-### Conjunto de mensagens do protocolo
+#### Conjunto de mensagens do protocolo
 
 O protocolo TFTP define cinco tipos de mensagens:
 
