@@ -20,7 +20,7 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
 
 ### Como testar as funcionalidades
 
->Afim de facilitar a instalação foi criado um Dockefile com as bibliotecas necessárias para o funcionamento
+>A fim de facilitar a instalação do aplicativo, foi criado um [Dockerfile](/Dockerfile) contendo as bibliotecas necessárias. Esse Dockerfile utiliza como base uma imagem do Ubuntu 22.04 e instala as dependências. As bibliotecas instaladas incluem build-essential, protobuf-compiler, libprotobuf-dev, python3-pip e python3-protobuf.
 
 1. Gerar a imagem a partir do Dockerfile
 
