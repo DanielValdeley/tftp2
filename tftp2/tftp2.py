@@ -130,7 +130,6 @@ class CallbackSend(poller.Callback):
             
 
     def handle_finish(self, packet):
-
         # Cria uma instacia do pacote recebido (deserializar)
         obj = p.Mensagem()
         obj.ParseFromString(packet)
@@ -226,7 +225,6 @@ class CallbackReceived(poller.Callback):
         
         
     def handle_rx(self, packet):
-    
         # Verifica se pacote e' valido
         if (packet == None):
             print(f"{self.prefixLog} packet is None!")
@@ -240,7 +238,6 @@ class CallbackReceived(poller.Callback):
             self._sock.sendto(ack, self._address)
 
         else: 
-
             # Cria uma instacia do pacote recebido (deserializar)
             obj = p.Mensagem()
             obj.ParseFromString(packet)
@@ -314,8 +311,11 @@ class CallbackReceived(poller.Callback):
 
 '''Classe CallbackList:
 
-        Declara um Callback capaz de fazer a listagem de uma pasta.'''
+        Declara um Callback capaz de fazer a listagem de uma pasta.
+        definidos do protocolo TFTP2 via socket.
+        Implementa a máquina de estados finitos (MEF).'''
 class CallbackList(poller.Callback):
+        
     prefixLog = "CallbackList: "
    
     def __init__(self, sock:socket, timeout:float, address, dir:str):
@@ -372,10 +372,16 @@ class CallbackList(poller.Callback):
         self.disable()   
 
 
+####################################################################################
+
+
 '''Classe CallbackCreateDir:
 
-        Declara um Callback capaz de criar uma pasta.'''
+        Declara um Callback capaz de criar uma pasta.
+        definidos do protocolo TFTP2 via socket.
+        Implementa a máquina de estados finitos (MEF).'''
 class CallbackCreateDir(poller.Callback):
+        
     prefixLog = "CallbackCreateDir: "
    
     def __init__(self, sock:socket, timeout:float, address, dir:str):
@@ -431,11 +437,17 @@ class CallbackCreateDir(poller.Callback):
         self.disable_timeout()         
         self.disable()   
 
+        
+####################################################################################
 
-'''Classe CallbackCreateDir:
 
-        Declara um Callback capaz de renomear ou remover arquivos.'''
+'''Classe CallbackMove:
+
+        Declara um Callback capaz de renomear ou remover arquivos.
+        definidos do protocolo TFTP2 via socket.
+        Implementa a máquina de estados finitos (MEF).'''
 class CallbackMove(poller.Callback):
+        
     prefixLog = "CallbackMove: "
    
     def __init__(self, sock:socket, timeout:float, address, oldfilename:str, newfilename:str):
@@ -444,7 +456,7 @@ class CallbackMove(poller.Callback):
         self._sock = sock
         self._address = address
 
-        # MOVE: mover ou renomear um arquivo
+        # MOVE: renomear ou remover um arquivo
         self._packet = p.Mensagem()
         self._packet.move.nome_orig = oldfilename
         self._packet.move.nome_novo = newfilename
