@@ -35,7 +35,7 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
 
 3. Dentro do contêiner execute o Servidor TFTP
    
-   - Entre no direorio `ptc/tftp2`
+   - Entre no diretório `ptc/tftp2`
    
    - Formato do comando de execução
 
