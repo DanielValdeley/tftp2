@@ -2,7 +2,6 @@
 
 import sys, time
 import socket
-#import msg_interface as m
 import poller
 import tftp2_pb2 as p
 
@@ -49,7 +48,7 @@ class CallbackSend(poller.Callback):
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
-        print('msg: ', obj)
+        print(f'{self.prefixLog} obj: {obj}')
 
         if obj.WhichOneof('msg') == 'ack':
             print('msg: ', obj)
@@ -86,10 +85,9 @@ class CallbackSend(poller.Callback):
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
-        print('msg: ', obj)
+        print(f'{self.prefixLog} obj: {obj}')
 
         if obj.WhichOneof('msg') == 'ack':
-            print('msg: ', obj)
             ack_n = obj.ack.block_n # obtem o ack_n
             print(f"{self.prefixLog} handle_tx() ack_n = {ack_n}")
 
@@ -134,7 +132,7 @@ class CallbackSend(poller.Callback):
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
-        print('msg: ', obj)
+        print(f'{self.prefixLog} obj: {obj}')
 
         if obj.WhichOneof('msg') == 'ack':
             ack_n = obj.ack.block_n # obtem o ack_n
@@ -233,7 +231,7 @@ class CallbackReceived(poller.Callback):
             #ack = m.Ack(blocknum)            
             a = p.Mensagem()
             a.ack.block_n = blocknum
-            ack = d.SerializeToString()
+            ack = p.SerializeToString()
 
             self._sock.sendto(ack, self._address)
 
@@ -242,7 +240,7 @@ class CallbackReceived(poller.Callback):
             obj = p.Mensagem()
             obj.ParseFromString(packet)
 
-            print('msg: ', obj)  
+            print(f'{self.prefixLog} obj: {obj}')
 
             if obj.WhichOneof('msg') == 'data':  
                 data_body = obj.data.message
@@ -342,7 +340,7 @@ class CallbackList(poller.Callback):
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
-        print('msg: ', obj)
+        print(f'{self.prefixLog} obj: {obj}')
 
         l = []
         if obj.WhichOneof('msg') == 'list_resp':
@@ -408,7 +406,7 @@ class CallbackCreateDir(poller.Callback):
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
-        print('msg: ', obj)
+        print(f'{self.prefixLog} obj: {obj}')
 
         if obj.WhichOneof('msg') == 'ack':
             ack = obj.ack.block_n # obtem ack com bumero de bloco 0
@@ -475,7 +473,7 @@ class CallbackMove(poller.Callback):
         obj = p.Mensagem()
         obj.ParseFromString(packet)
 
-        print('msg: ', obj)
+        print(f'{self.prefixLog} obj: {obj}')
 
         if obj.WhichOneof('msg') == 'ack':
             ack = obj.ack.block_n # obtem ack com bumero de bloco 0
