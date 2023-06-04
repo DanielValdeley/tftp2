@@ -57,19 +57,28 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
     ```
 
    - Exemplo de uso
+   
+      - RECV
+         ```shell
+             python3 client_test.py arquivo 1 1 127.0.0.1 6969
+         ```
   
+     - SEND
+        ```shell
+            python3 client_test.py arquivo 2 1 127.0.0.1 6969
+        ```
+     
      - LIST
-
         ```shell
             python3 client_test.py . 3 1 127.0.0.1 6969
         ```
 
-      - MKDIR
+     - MKDIR
         ```shell
             python3 client_test.py nova-pasta-criada 4 1 127.0.0.1 6969
         ```
 
-      - MOVE
+     - MOVE
         ```shell
             python3 client_test.py arquivo 5 1 127.0.0.1 6969 novo-nome-arquivo
         ```
