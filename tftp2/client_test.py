@@ -83,3 +83,19 @@ elif request == Request.MKDIR.value:
 # Solicitacao de renomeação/remoção de um arquivo (renomeação: ok)
 elif request == Request.MOVE.value:
     c.move(oldfilename=namefile, newfilename=newnamefile)
+
+##############################
+# checklist funcionalidades###
+##############################
+# [ok] recebimento de arquivo
+#     [ok] arquivo pequeno
+#     [ok] arquivo grande
+#
+# [ok] envio de arquivo
+#     [ok] arquivo pequeno
+#     [ok] arquivo grande
+#
+# [ok] listar pasta
+# [ok] criar ṕasta
+# [[ok][*]] renomear ou remover arquivo
+# obs.: [*] servidor disponibilizado pelo professor não está removendo quando novo nome do arquivo é vazio

@@ -4,6 +4,7 @@ import sys, time
 import socket
 import poller
 import tftp2_pb2 as p
+import traceback
 
 '''Classe CallbackSend:
 
@@ -285,15 +286,16 @@ class CallbackReceived(poller.Callback):
     def handle(self):
         'Recebe pacote via socket'
         try:
-            packet, addr = self._sock.recvfrom(516)
+            packet, addr = self._sock.recvfrom(1024)
             print(f"{self.prefixLog} Received packet: {packet}, address: {addr}")
             self._address = (addr[0], addr[1])
             self._current_handler(packet=packet)
 
-        except:
-            'Se ocorrer algum erro na recpecao chama handle_timeout'
-            print(f"{self.prefixLog} fail received packet!")
-            self._current_handler = self.handle_timeout
+        except Exception as e:
+            'Se ocorrer algum erro seja de recepcao do pacote ou seja no estato atual mostra o erro'
+            print(f"{self.prefixLog} error: {e}")
+            traceback.print_exc()
+            sys.exit()
             
 
     def handle_timeout(self):
