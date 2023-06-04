@@ -20,7 +20,7 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
 
 ### Como testar as funcionalidades
 
->A fim de facilitar a instalação do aplicativo, foi criado um [Dockerfile](/Dockerfile) contendo as bibliotecas necessárias. Esse Dockerfile utiliza como base uma imagem do Ubuntu 22.04 e instala as dependências. As bibliotecas instaladas incluem build-essential, protobuf-compiler, libprotobuf-dev, python3-pip e python3-protobuf.
+>A fim de facilitar a instalação do aplicativo, foi criado um [Dockerfile](/Dockerfile) contendo as bibliotecas necessárias. Esse Dockerfile utiliza como base uma imagem do Ubuntu 22.04 e instala as dependências. As bibliotecas instaladas incluem build-essential, protobuf-compiler, libprotobuf-dev, python3-pip, python3-protobuf e tmux.
 
 1. Gerar a imagem a partir do Dockerfile
 
@@ -33,7 +33,7 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
     docker run -it --rm -v `pwd`:/ptc  --name tftp2 ptc/tftp2
 ```
 
-3. Dentro do contêiner execute o Servidor TFTP
+3. Dentro do contêiner execute o **Servidor TFTP**
    
    - Entre no diretório `ptc/tftp2`
    
@@ -48,7 +48,7 @@ O projeto tftp2 é uma versão incrementada do protocolo [TFTP](https://github.c
     ```
 
 
-2. Dentro do contêiner execute o cliente TFTP2
+2. Dentro do contêiner execute o Cliente TFTP2
 
    - Formato do comando de execução
 
