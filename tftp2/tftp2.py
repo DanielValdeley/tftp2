@@ -167,7 +167,7 @@ class CallbackSend(poller.Callback):
     def handle(self):
         'Recebe pacote via socket'
         try:
-            packet, addr = self._sock.recvfrom(516)
+            packet, addr = self._sock.recvfrom(1024)
             print(f"{self.prefixLog} Received packet: handle() {packet}, address -> ip:{addr[0]} | port: {addr[1]}")
             self._address = (addr[0], addr[1])
             self._current_handler(packet=packet)
@@ -232,7 +232,7 @@ class CallbackReceived(poller.Callback):
             #ack = m.Ack(blocknum)            
             a = p.Mensagem()
             a.ack.block_n = blocknum
-            ack = p.SerializeToString()
+            ack = a.SerializeToString()
 
             self._sock.sendto(ack, self._address)
 
@@ -355,7 +355,7 @@ class CallbackList(poller.Callback):
     def handle(self):
         'Recebe pacote via socket'
         try:
-            packet, addr = self._sock.recvfrom(516)
+            packet, addr = self._sock.recvfrom(1024)
             print(f"{self.prefixLog} Received packet: {packet}, address: {addr}")
             self._address = (addr[0], addr[1])
             self._current_handler(packet=packet)
@@ -421,7 +421,7 @@ class CallbackCreateDir(poller.Callback):
     def handle(self):
         'Recebe pacote via socket'
         try:
-            packet, addr = self._sock.recvfrom(516)
+            packet, addr = self._sock.recvfrom(1024)
             print(f"{self.prefixLog} Received packet: {packet}, address: {addr}")
             self._address = (addr[0], addr[1])
             self._current_handler(packet=packet)
@@ -488,7 +488,7 @@ class CallbackMove(poller.Callback):
     def handle(self):
         'Recebe pacote via socket'
         try:
-            packet, addr = self._sock.recvfrom(516)
+            packet, addr = self._sock.recvfrom(1024)
             print(f"{self.prefixLog} Received packet: {packet}, address: {addr}")
             self._address = (addr[0], addr[1])
             self._current_handler(packet=packet)

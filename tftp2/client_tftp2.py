@@ -6,7 +6,7 @@ import tftp2 as t
 
 ''' Classe Cliente TFTP2
 
-    Classe capaz prover recursos de envio e recepeção de arquivo.
+    Classe capaz prover recursos de envio e recepeção de arquivo, bem como listagem, criação e renomeação ou remoção de arquivo.
     Utiliza dos recursos do tftp2 importado no topo desse arquivo.
     Para a solicitação de escrita de um arquivo no servivor faz uso do CallbackSend
     Para a solicitação de leitura de um arquivo do servivor faz uso do CallbackReceived
